@@ -5,7 +5,7 @@ import groovy.json.JsonSlurper
 class Bar {
 
     static String loadName(String key) {
-        def json = Bar.getResourceAsStream("bar.json")
+        def json = libraryResource "org/foo/bar.json"
         return json
     }
 
