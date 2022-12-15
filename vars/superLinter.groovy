@@ -16,10 +16,6 @@ def call(Map config = [:]) {
                 }
                 steps {
                     sh "env | sort"
-                    // echo "${agentLabel}"
-                    // echo "${pipelineParams.osConfiguration}"
-                    // echo "${pipelineParams.osConfiguration.OS_VERSION}"
-                    // echo "${pipelineParams.osConfiguration.DIR_TYPE}" 
                     sh """
                         pwd
                         /action/lib/linter.sh
