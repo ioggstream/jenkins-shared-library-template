@@ -1,90 +1,38 @@
-def call(String agentLabel,body) {
+def call(Map config = [:]) {
     
-    def pipelineParams= [:]
-    body.resolveStrategy = Closure.DELEGATE_FIRST
-    body.delegate = pipelineParams
-    body()
+    def pipelineParams = [:]
 
     pipeline {
-        agent none
+        agent any
+        options {
+            ansiColor('xterm')
+        }
         stages {
-            stage("echo parameters") {
-                agent { label "${agentLabel}" }
+            stage("Super-Linter") {
+                agent { 
+                    kubernetes {
+                        cloud config.cloud
+                        yamlFile config.yamlFile
+                        defaultContainer 'super-linter'
+                    }
+                }
                 steps {
                     sh "env | sort"
                     echo "${agentLabel}"
                     echo "${pipelineParams.osConfiguration}"
                     echo "${pipelineParams.osConfiguration.OS_VERSION}"
-                    echo "${pipelineParams.osConfiguration.DIR_TYPE}"                    
+                    echo "${pipelineParams.osConfiguration.DIR_TYPE}" 
+                    sh """
+                        pwd
+                        /action/lib/linter.sh
+                        """
                 }
             }
-            stage("Prepare Build Environment") {
-                agent { label "${agentLabel}" }
-                steps {
-                    prepareBuildEnvironment()
-                    helloWorld(name: "prepareBuildEnvironment")
-                    helloWorldExternal()
-                }
-            }
-            stage("Source Code Checkout") {
-                agent { label "${agentLabel}" }
-                steps {
-                    echo 'scc'
-                }
-            }
-            stage("SonarQube Scan") {
-                agent { label "${agentLabel}" }
-                when {
-                    branch 'master'
-                }
-                steps {
-                    echo 'scan'
-                }
-            }
-            stage("Build Application") {
-                agent { label "${agentLabel}" }
-                steps {
-                    echo 'build'
-                }
-            }
-            stage("Publish Artifacts") {
-                agent { label "${agentLabel}" }
-                steps {
-                    publishArtifacts(name: "publishArtifacts")
-                }
-            }
-            stage("Deploy Application") {
-                agent { label "${agentLabel}" }
-                steps {
-                    deployApplication(name: "deployApplication")
-                }
-            }
-            //stage("Long Running Stage") {
-            //    agent { label "${agentLabel}" }
-            //    steps {
-            //        script {
-            //            hook = registerWebhook()
-            //        }
-            //    }
-            //}
-            //stage("Waiting for Webhook") {
-            //    steps {
-            //        echo "Waiting for POST to ${hook.getURL()}"
-            //        script {
-            //            data = waitForWebhook hook
-            //        }
-            //        echo "Webhook called with data: ${data}"
-            //    }
-            //}         
         }
-        //post {
-        //    always {
-        //        sendNotification()
-        //    }
-        //}
+
         post {
             always {
-              addSidebarLink()
+                echo 'Super-linter. check the results.'
             }
         }
     }
