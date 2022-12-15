@@ -6,20 +6,20 @@ def call(Map config = [:]) {
         agent any
 
         stages {
-            stage("Super-Linter") {
+            stage("Owasp") {
                 agent { 
                     kubernetes {
                         cloud config.cloud
                         yamlFile config.yamlFile
-                        defaultContainer 'super-linter'
+                        defaultContainer 'owasp'
                     }
                 }
                 steps {
                     sh "env | sort"
                     sh """
                         pwd
-                        ls -lR /home/jenkins || true
-                        /action/lib/linter.sh
+                        ls -l /home/jenkins -R || true
+                        /usr/share/dependency-check/bin/dependency-check.sh -s ${config.workdir}
                         """
                 }
             }
@@ -27,7 +27,7 @@ def call(Map config = [:]) {
 
         post {
             always {
-                echo 'Super-linter. check the results.'
+                echo 'OWASP. check the results.'
             }
         }
     }
