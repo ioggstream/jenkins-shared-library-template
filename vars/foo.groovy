@@ -1,6 +1,6 @@
 import org.foo.Bar
 
 def call() {
-    String name = "foo"
+    String name = Bar.loadName("foo")
     echo "Hello, ${name}!"
 }
