@@ -1,6 +1,6 @@
 import org.foo.Bar
 
 def call() {
-    String name = Bar.loadName("foo")
+    String name = libraryResource "org/foo/bar.json"
     echo "Hello, ${name}!"
 }
