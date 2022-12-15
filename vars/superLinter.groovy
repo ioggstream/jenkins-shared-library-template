@@ -4,9 +4,7 @@ def call(Map config = [:]) {
 
     pipeline {
         agent any
-        options {
-            ansiColor('xterm')
-        }
+
         stages {
             stage("Super-Linter") {
                 agent { 
